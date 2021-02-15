@@ -11,7 +11,7 @@ const auth = require('../middlewares/auth');
 const { bikeStatuses, httpStatuses } = require('../constants');
 const { RIDE_FEE_PER_HOUR } = require('../config');
 
-const setBikeStatus = require('../services/connection-with-bike');
+const { setBikeStatus, getBikeStatus } = require('../services/connection-with-bike');
 
 router.get('/', async (req, res) => {
   try {
@@ -22,11 +22,12 @@ router.get('/', async (req, res) => {
   }
 });
 
-router.get('/:id', (req, res) => {
+router.get('/:id', async (req, res) => {
   try {
-    res.send(req.params.id);
+    const status = await getBikeStatus({ bikeId: req.params.id });
+    res.send(status);
   } catch (e) {
-    res.sent(e);
+    res.send(e);
   }
 });
 
