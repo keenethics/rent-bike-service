@@ -5,16 +5,13 @@ const mongoose = require('mongoose');
 
 const express = require('express');
 
-const config = {
-  PORT: 3000,
-  DB_ADDRESS: 'mongodb://localhost/rent-service',
-}
+const { PORT, DB_ADDRESS } = require('./config.js')
 
 const app = express();
-app.use(express.json())
+app.use(express.json());
 
-app.use('/bicycles', bicyclesRoutes)
-app.use('/users', usersRoutes)
+app.use('/bicycles', bicyclesRoutes);
+app.use('/users', usersRoutes);
 
 app.get('/', (req, res) => {
   res.send('System is up');
@@ -22,15 +19,15 @@ app.get('/', (req, res) => {
 
 (async () => {
   try {
-    await mongoose.connect(config.DB_ADDRESS, {
+    await mongoose.connect(DB_ADDRESS, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
       useFindAndModify: false,
       useCreateIndex: true
     });
 
-    app.listen(config.PORT);
-    console.log(`App is listening on port: ${config.PORT}`);
+    app.listen(PORT);
+    console.log(`App is listening on port: ${PORT}`);
   } catch (e) {
     console.error(e)
   }

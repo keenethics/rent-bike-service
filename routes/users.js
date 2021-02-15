@@ -25,6 +25,8 @@ router.post('/funds', auth, async (req, res) => {
     const {funds} = req.body;
     const resp = await User.updateOne({_id: req.userId}, {
       funds
+    }, {
+      runValidators: true,
     })
     res.send(resp)
   } catch (e) {
