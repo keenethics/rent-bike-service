@@ -8,6 +8,7 @@ module.exports = {
     ok: 200,
     paymentRequired: 402,
     badRequest: 400,
+    unauthorized: 401,
     locked: 423,
   },
 };

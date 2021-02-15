@@ -20,10 +20,9 @@ const updateModel = async (data) => {
       `http://${MANAGEMENT_APPLICATION_HOST}/bicycles/${SYSTEM_ID}`,
       data,
     );
-    // console.log(response);
     return response;
   } catch (e) {
-    console.error(e);
+    console.error('No connection to management application');
   }
 };
 

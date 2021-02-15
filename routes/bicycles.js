@@ -53,6 +53,13 @@ router.post('/:id/rent', auth, async (req, res) => {
     const { id: bikeId } = params;
     const user = await User.findOne({ _id: userId });
 
+    if (!user) {
+      res
+        .status(httpStatuses.unauthorized)
+        .send('User not found');
+      return;
+    }
+
     if (parseInt(user.funds) < RIDE_FEE_PER_HOUR) {
       res
         .status(httpStatuses.locked)
@@ -152,10 +159,8 @@ router.post('/:id/rent-end', auth, async (req, res) => {
     return;
   }
 
-  const rideTime = Math.ceil((new Date() - ride.createdAt) / 1000 * 60 * 60);
-  // const costsToDischarge = rideTime / RIDE_FEE_PER_HOUR;
-  // FIXME: this logic
-  const costsToDischarge = RIDE_FEE_PER_HOUR;
+  const rideTime = (new Date() - ride.createdAt) / 1000 / 60 / 60;
+  const costsToDischarge = rideTime * RIDE_FEE_PER_HOUR;
 
   const user = await User.findById(userId);
 
