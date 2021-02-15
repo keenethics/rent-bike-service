@@ -1,5 +1,5 @@
-const {JWT_SECRET} = require('../config')
 const jwt = require('jsonwebtoken');
+const {JWT_SECRET} = require('../config');
 
 module.exports = async (req, res, next) => {
   const { token } = req.body;

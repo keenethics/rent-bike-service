@@ -1,13 +1,12 @@
 const mongoose = require('mongoose');
 
-const Schema = mongoose.Schema;
-const ObjectId = Schema.ObjectId;
-
+const {Schema} = mongoose;
+const {ObjectId} = Schema;
 
 const User = new Schema({
   funds: {
     type: Number,
-    default: 0
+    default: 0,
   },
   // light: {
   //   type: String,
@@ -21,6 +20,6 @@ const User = new Schema({
   // }
 }, {
   timestamps: true,
-})
+});
 
-module.exports = mongoose.model('User', User)
+module.exports = mongoose.model('User', User);

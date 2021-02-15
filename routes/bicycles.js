@@ -2,24 +2,24 @@ const express = require('express');
 
 const router = express.Router();
 
-const Bicycle = require('../models/Bicycle')
-const User = require('../models/User')
-const Ride = require('../models/Ride')
-
-const axios = require('axios');
+const Bicycle = require('../models/Bicycle');
+const User = require('../models/User');
+const Ride = require('../models/Ride');
 
 const auth = require('../middlewares/auth');
 
-const {bikeStatuses, httpStatuses} = require('../constants')
-const {RIDE_FEE_PER_HOUR} = require('../config')
+const {bikeStatuses, httpStatuses} = require('../constants');
+const {RIDE_FEE_PER_HOUR} = require('../config');
 
-//get bicycles list (bicycle id, status, other params ... )
+const setBikeStatus = require('../services/connection-with-bike');
+
+// get bicycles list (bicycle id, status, other params ... )
 router.get('/', async (req, res) => {
   try {
-    const bicycles = await Bicycle.find({})
-    res.send(bicycles)
+    const bicycles = await Bicycle.find({});
+    res.send(bicycles);
   } catch (e) {
-    res.sent(e)
+    res.sent(e);
   }
 });
 
@@ -27,24 +27,23 @@ router.get('/turn-light', async (req, res) => {
   try {
     const bicycles = await Bicycle.find({
       status: {
-        $ne: 'broken'
-      }
+        $ne: 'broken',
+      },
     });
 
-
-    res.send(bicycles)
+    res.send(bicycles);
   } catch (e) {
-    res.sent(e)
+    res.sent(e);
   }
 });
 
 router.get('/:id', (req, res) => {
   try {
-    res.send(req.params.id)
+    res.send(req.params.id);
   } catch (e) {
-    res.sent(e)
+    res.sent(e);
   }
-})
+});
 
 router.patch('/:id', async (req, res) => {
   try {
@@ -53,22 +52,28 @@ router.patch('/:id', async (req, res) => {
     const resp = await Bicycle.findOneAndUpdate({_id: id}, body,
       {
         runValidators: true,
-        upsert: true
+        upsert: true,
       });
 
-    res.send(resp)
+    res.send(resp);
   } catch (e) {
-    res.sent(e)
+    res.sent(e);
   }
 });
-
 
 router.post('/:id/rent', auth, async (req, res) => {
   try {
     const {userId, params} = req;
     const {id: bikeId} = params;
-    const {body} = req;
-    const RIDE_FEE = 5;
+    const user = await User.findOne({_id: userId});
+
+    if (parseInt(user.funds) < RIDE_FEE_PER_HOUR) {
+      res
+        .status(httpStatuses.locked)
+        .send('Please add funds to your account');
+      return;
+    }
+
     const bike = await Bicycle.findOne({_id: bikeId});
 
     if (bike.status !== bikeStatuses.free) {
@@ -78,19 +83,10 @@ router.post('/:id/rent', auth, async (req, res) => {
       return;
     }
 
-    const user = await User.findOne({_id: userId});
-
-    if (parseInt(user.funds) < RIDE_FEE) {
-      res
-        .status(httpStatuses.locked)
-        .send('Please add funds to your account');
-      return;
-    }
-
-    const notFinishedRides = await Ride.count({
+    const notFinishedRides = await Ride.countDocuments({
       userId,
-      finishedAt: null
-    })
+      finishedAt: null,
+    });
 
     if (notFinishedRides > 0) {
       res
@@ -99,14 +95,23 @@ router.post('/:id/rent', auth, async (req, res) => {
       return;
     }
 
+    await setBikeStatus({
+      bikeId,
+      bikeIp: bike.ip,
+      data: {
+        status: bikeStatuses.busy,
+        locked: false,
+      },
+    });
+
     const ride = await Ride.create({
       userId,
       bikeId,
-    })
+    });
 
-    res.send(ride)
+    res.send(ride);
   } catch (e) {
-    res.sent(e)
+    res.send(e);
   }
 });
 
@@ -114,13 +119,24 @@ router.post('/:id/rent-end', auth, async (req, res) => {
   const {userId, params} = req;
   const {id: bikeId} = params;
 
+  const bike = await Bicycle.findOne({_id: bikeId});
+
+  await setBikeStatus({
+    bikeId,
+    bikeIp: bike.ip,
+    data: {
+      status: bikeStatuses.free,
+      locked: true,
+    },
+  });
+
   const ride = await Ride.findOne({
     userId,
     bikeId,
-    finishedAt: null
-  })
+    finishedAt: null,
+  });
 
-  if(!ride) {
+  if (!ride) {
     res
       .status(httpStatuses.badRequest)
       .send('No rides to finish');
@@ -129,7 +145,7 @@ router.post('/:id/rent-end', auth, async (req, res) => {
 
   const rideTime = Math.ceil((new Date() - ride.createdAt) / 1000 * 60 * 60);
   // const costsToDischarge = rideTime / RIDE_FEE_PER_HOUR;
-  //FIXME: this logic
+  // FIXME: this logic
   const costsToDischarge = RIDE_FEE_PER_HOUR;
 
   const user = await User.findById(userId);
@@ -140,26 +156,23 @@ router.post('/:id/rent-end', auth, async (req, res) => {
       .send('You have rode more than had money. We will contact you soon');
   }
 
-  const fundsLeft = user.funds - costsToDischarge
+  const fundsLeft = user.funds - costsToDischarge;
   user.funds = fundsLeft;
-  await user.save()
+  await user.save();
 
   ride.finishedAt = new Date();
   ride.cost = costsToDischarge;
-  await ride.save()
-  res.send({feePerRide: costsToDischarge, fundsLeft})
-
-
+  await ride.save();
+  res.send({feePerRide: costsToDischarge, fundsLeft});
 });
-
 
 // turn light on all bicycles
 router.get('/turn-light', (req, res) => {
   try {
-    res.send('All the bicycles is here')
+    res.send('All the bicycles is here');
   } catch (e) {
-    res.sent(e)
+    res.sent(e);
   }
-})
+});
 
 module.exports = router;

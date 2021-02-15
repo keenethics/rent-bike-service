@@ -3,4 +3,4 @@ module.exports = {
   PORT: 3000,
   DB_ADDRESS: 'mongodb://localhost/rent-service',
   RIDE_FEE_PER_HOUR: 5,
-}
+};

@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
-const Schema = mongoose.Schema;
-const ObjectId = Schema.ObjectId;
+const {Schema} = mongoose;
+const {ObjectId} = Schema;
 
 const Ride = new Schema({
   createdAt: {
@@ -18,10 +18,10 @@ const Ride = new Schema({
   },
   finishedAt: {
     type: Date,
-    default: null
+    default: null,
   },
 }, {
   timestamps: true,
-})
+});
 
-module.exports = mongoose.model('Ride', Ride)
+module.exports = mongoose.model('Ride', Ride);
