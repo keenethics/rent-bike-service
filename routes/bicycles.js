@@ -8,8 +8,8 @@ const Ride = require('../models/Ride');
 
 const auth = require('../middlewares/auth');
 
-const {bikeStatuses, httpStatuses} = require('../constants');
-const {RIDE_FEE_PER_HOUR} = require('../config');
+const { bikeStatuses, httpStatuses } = require('../constants');
+const { RIDE_FEE_PER_HOUR } = require('../config');
 
 const setBikeStatus = require('../services/connection-with-bike');
 
@@ -47,9 +47,9 @@ router.get('/:id', (req, res) => {
 
 router.patch('/:id', async (req, res) => {
   try {
-    const {id} = req.params;
-    const {body} = req;
-    const resp = await Bicycle.findOneAndUpdate({_id: id}, body,
+    const { id } = req.params;
+    const { body } = req;
+    const resp = await Bicycle.findOneAndUpdate({ _id: id }, body,
       {
         runValidators: true,
         upsert: true,
@@ -63,9 +63,9 @@ router.patch('/:id', async (req, res) => {
 
 router.post('/:id/rent', auth, async (req, res) => {
   try {
-    const {userId, params} = req;
-    const {id: bikeId} = params;
-    const user = await User.findOne({_id: userId});
+    const { userId, params } = req;
+    const { id: bikeId } = params;
+    const user = await User.findOne({ _id: userId });
 
     if (parseInt(user.funds) < RIDE_FEE_PER_HOUR) {
       res
@@ -74,7 +74,7 @@ router.post('/:id/rent', auth, async (req, res) => {
       return;
     }
 
-    const bike = await Bicycle.findOne({_id: bikeId});
+    const bike = await Bicycle.findOne({ _id: bikeId });
 
     if (bike.status !== bikeStatuses.free) {
       res
@@ -116,10 +116,10 @@ router.post('/:id/rent', auth, async (req, res) => {
 });
 
 router.post('/:id/rent-end', auth, async (req, res) => {
-  const {userId, params} = req;
-  const {id: bikeId} = params;
+  const { userId, params } = req;
+  const { id: bikeId } = params;
 
-  const bike = await Bicycle.findOne({_id: bikeId});
+  const bike = await Bicycle.findOne({ _id: bikeId });
 
   await setBikeStatus({
     bikeId,
@@ -163,7 +163,7 @@ router.post('/:id/rent-end', auth, async (req, res) => {
   ride.finishedAt = new Date();
   ride.cost = costsToDischarge;
   await ride.save();
-  res.send({feePerRide: costsToDischarge, fundsLeft});
+  res.send({ feePerRide: costsToDischarge, fundsLeft });
 });
 
 // turn light on all bicycles
