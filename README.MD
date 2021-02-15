@@ -41,3 +41,8 @@ Bicycle emulator sends its status every 1 minute, in case of managament applicat
 ## Data-flow diagram
 
 ![Diagram](https://cleanshot-cloud-fra.s3.eu-central-1.amazonaws.com/media/9685/59moq6MEm5I9l1BKxGHSCalRXqldzMN4D6iuiHHG.jpeg?X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Security-Token=IQoJb3JpZ2luX2VjECsaDGV1LWNlbnRyYWwtMSJIMEYCIQCV4ZljMbuwBD5GBmlIoWGzN6MMwfVwdkxlk02GpaN%2BJgIhAIypFj3avkK8pt6hvCX%2BPhGb%2Fjy4CJzkPAWoFMx5EROuKtkBCDQQABoMOTE5NTE0NDkxNjc0IgzE4mF4zVYRTo64NBkqtgFAJBuIdEEGhi%2FBXOfykJqpV4rJKoyI8aRisxMCLxe%2FLL%2FGXD7tQgbd6xM%2BXDCvTKfs9R9A7i7QEwZpeJxkeo6JscsJxal8E3UHZVIyA%2Fk2zTeNICC4n6vTS3fwqI0z8SLZSrGOUJ8B4qAVQBJr78oIB%2BwGHMa41WrCETotbJhorggSza5wJUDaHAszHpN1hDkHExhDlPr5pN41tVjduJLwIz%2FC16wePyKkJogyBSmQSJo33bZ2ijCGj6uBBjrfAaHu5mGO5%2B%2B59JSxgP%2F3UW32YTyc5kFFOOuDEM7Z8r12bACIiCCQRd5goEShI%2FjUA3X4LgE9ywhJmSr0InUMTYDpvQukuqrUb8qs1tY8f%2BRTLfJ2PTaj8RDs9e7n0lw396E0I7qfhij2Hcu8AIKvveaJls2PfCHoFWZmguK%2Bg0At1gCA4215G9DvWCf1BeyNfxhgO%2FMxPKYV1gVb5qWHalN04V%2FXHlosjAukaRSmlUuEgRdMQ2ia52kat21t1mweMH7BebyJJcDiDR9am8VdnHBnvq%2BLHBueggMxqUhaxIk%3D&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=ASIA5MF2VVMNN5W7TTG4%2F20210215%2Feu-central-1%2Fs3%2Faws4_request&X-Amz-Date=20210215T204826Z&X-Amz-SignedHeaders=host&X-Amz-Expires=300&X-Amz-Signature=1ff64e2bb4c027ccb536583882fe70bb8d9207d3c02f86707272bb9d26349b08)
+
+# How to run the project?
+1) Add setting to config.js
+2) `node app.js` or if you have nodemon `npm run start`
+3) Run as many bicycle emulators as you want (but on different ports) ```node bike.js objectBikeId PORT```
