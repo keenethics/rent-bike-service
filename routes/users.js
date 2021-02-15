@@ -23,12 +23,11 @@ router.post('/join', async(req, res) => {
 router.post('/funds', auth, async (req, res) => {
   try {
     const {funds} = req.body;
-    const resp = await User.updateOne({_id: req.userId}, {
-      funds
-    }, {
-      runValidators: true,
-    })
-    res.send(resp)
+    const user = await User.findById(req.userId);
+    const fundsLeft = user.funds + funds
+    user.funds = fundsLeft;
+    await user.save()
+    res.send({fundsLeft})
   } catch (e) {
     res.status(500).send(e);
   }
