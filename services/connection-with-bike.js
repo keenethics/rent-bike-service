@@ -1,19 +1,19 @@
 const axios = require('axios');
 const Bicycle = require('../models/Bicycle');
-const {bikeStatuses, httpStatuses} = require('../constants');
+const { bikeStatuses } = require('../constants');
 
 const setBikeStatus = async ({
-                               bikeId,
-                               bikeIp,
-                               data,
-                             }) => {
+  bikeId,
+  bikeIp,
+  data,
+}) => {
   const resp = await axios.post(`http://${bikeIp}`, data);
 
   if (resp.status !== 200) {
     await Bicycle.findByIdAndUpdate(bikeId, {
       status: bikeStatuses.broken,
     });
-    return resp;
+    throw Error('No connection to the bike');
   }
 
   await Bicycle.findByIdAndUpdate(bikeId, data,

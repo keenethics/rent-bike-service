@@ -12,5 +12,6 @@
 - return a bicycle (end ride for the user, then calculate ride cost)
   POST /bicycles/{bikeId}/rent-end
   
-
+- turn light on all bicycles
+  POST /bicycles/turn-light
     

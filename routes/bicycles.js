@@ -13,24 +13,9 @@ const { RIDE_FEE_PER_HOUR } = require('../config');
 
 const setBikeStatus = require('../services/connection-with-bike');
 
-// get bicycles list (bicycle id, status, other params ... )
 router.get('/', async (req, res) => {
   try {
     const bicycles = await Bicycle.find({});
-    res.send(bicycles);
-  } catch (e) {
-    res.sent(e);
-  }
-});
-
-router.get('/turn-light', async (req, res) => {
-  try {
-    const bicycles = await Bicycle.find({
-      status: {
-        $ne: 'broken',
-      },
-    });
-
     res.send(bicycles);
   } catch (e) {
     res.sent(e);
@@ -115,11 +100,34 @@ router.post('/:id/rent', auth, async (req, res) => {
   }
 });
 
+router.post('/:id/broken', async (req, res) => {
+  const { params } = req;
+  const { id: bikeId } = params;
+
+  const bike = await Bicycle.findById(bikeId);
+
+  await setBikeStatus({
+    bikeId,
+    bikeIp: bike.ip,
+    data: {
+      status: bikeStatuses.broken,
+    },
+  });
+  res.send('Thanks for notifying about broken bicycle!');
+});
+
 router.post('/:id/rent-end', auth, async (req, res) => {
   const { userId, params } = req;
   const { id: bikeId } = params;
 
   const bike = await Bicycle.findOne({ _id: bikeId });
+
+  if (bike.status !== bikeStatuses.busy) {
+    res
+      .status(httpStatuses.badRequest)
+      .send('This bike is not in use');
+    return;
+  }
 
   await setBikeStatus({
     bikeId,
@@ -166,10 +174,37 @@ router.post('/:id/rent-end', auth, async (req, res) => {
   res.send({ feePerRide: costsToDischarge, fundsLeft });
 });
 
-// turn light on all bicycles
-router.get('/turn-light', (req, res) => {
+router.post('/turn-light', async (req, res) => {
   try {
-    res.send('All the bicycles is here');
+    const bicycles = await Bicycle.find({
+      status: {
+        $ne: 'broken',
+      },
+    });
+
+    const turnedLightOnBikes = [];
+    const noConnectionToBikes = [];
+    // eslint-disable-next-line no-restricted-syntax
+    for (const bike of bicycles) {
+      try {
+        // eslint-disable-next-line no-await-in-loop
+        await setBikeStatus({
+          bikeId: bike.id,
+          bikeIp: bike.ip,
+          data: {
+            light: 'on',
+          },
+        });
+        turnedLightOnBikes.push(bike.id);
+      } catch (e) {
+        noConnectionToBikes.push(bike.id);
+      }
+    }
+
+    res.send({
+      turnedLightOnBikes,
+      noConnectionToBikes,
+    });
   } catch (e) {
     res.sent(e);
   }
