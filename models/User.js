@@ -8,16 +8,6 @@ const User = new Schema({
     type: Number,
     default: 0,
   },
-  // light: {
-  //   type: String,
-  //   enum: ['on', 'off']
-  // },
-  // location: String,
-  // ip: String,
-  // status: {
-  //   type: String,
-  //   enum: ['busy', 'free', 'broken']
-  // }
 }, {
   timestamps: true,
 });
