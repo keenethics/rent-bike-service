@@ -18,7 +18,7 @@ router.get('/', async (req, res) => {
     const bicycles = await Bicycle.find({});
     res.send(bicycles);
   } catch (e) {
-    res.sent(e);
+    res.send(e);
   }
 });
 
@@ -43,7 +43,7 @@ router.patch('/:id', async (req, res) => {
 
     res.send(resp);
   } catch (e) {
-    res.sent(e);
+    res.send(e);
   }
 });
 
@@ -212,7 +212,7 @@ router.post('/turn-light', async (req, res) => {
       noConnectionToBikes,
     });
   } catch (e) {
-    res.sent(e);
+    res.send(e);
   }
 });
 
